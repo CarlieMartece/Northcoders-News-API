@@ -3,6 +3,7 @@ const app = require('../app.js');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const data = require('../db/data/development-data/');
+const topics = require('../db/data/development-data/topics.js');
 
 afterAll (() => {
     return db.end();
@@ -22,7 +23,15 @@ describe('/api/topics', () => {
                 expect(Object.keys(response.body.topics[0])).toEqual(
                     expect.arrayContaining(['slug', 'description'])
                 );
-            })
+                topics.forEach((topic) => {
+                    expect(topic).toEqual(
+                        expect.objectContaining({
+                            slug: expect.any(String),
+                            description: expect.any(String),
+                        })
+                    );
+                });
+            });
     });
 });
 
