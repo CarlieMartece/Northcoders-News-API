@@ -25,3 +25,14 @@ describe('/api/topics', () => {
             })
     });
 });
+
+describe('handles all bad URLs', () => {
+    test('GET:404 bad path response for all bad urls', () => {
+        return request(app)
+            .get('/api/nonsense')
+            .expect(404)
+            .then(({body}) => {
+                expect(body.msg).toBe('bad path');
+            });
+    });
+});

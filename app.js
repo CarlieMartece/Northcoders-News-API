@@ -7,4 +7,9 @@ const {
 
 app.get('/api/topics', getTopics);
 
+app.all('*', (req, res) => {
+    res.status(404).send({ msg: 'bad path' });
+});
+
+
 module.exports = app;
