@@ -3,7 +3,6 @@ const app = require('../app.js');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const data = require('../db/data/development-data/');
-const topics = require('../db/data/development-data/topics.js');
 
 afterAll (() => {
     return db.end();
@@ -18,9 +17,10 @@ describe('/api/topics', () => {
         return request(app)
             .get('/api/topics')
             .expect(200)
-            .then((response) => {
-                expect(response.body.topics).toEqual(expect.any(Array));
-                expect(Object.keys(response.body.topics[0])).toEqual(
+            .then(({ body }) => {
+                const { topics } = body;
+                expect(topics).toEqual(expect.any(Array));
+                expect(Object.keys(topics[0])).toEqual(
                     expect.arrayContaining(['slug', 'description'])
                 );
                 topics.forEach((topic) => {
@@ -44,4 +44,26 @@ describe('handles all bad URLs', () => {
                 expect(body.msg).toBe('bad path');
             });
     });
+});
+
+describe('/api/articles/:article_id', () => {
+    test('GET:200 sends a single article to the client', () => {
+        return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+                const { article } = body;
+                expect(article[0]).toEqual(
+                    expect.objectContaining({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                    })
+                );
+            });
+    })  ;
 });
