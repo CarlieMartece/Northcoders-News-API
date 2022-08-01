@@ -36,7 +36,7 @@ describe('/api/topics', () => {
 });
 
 describe('handles all bad URLs', () => {
-    test('GET:404 bad path response for all bad urls', () => {
+    test('GET:404 sends bad path response for all bad urls', () => {
         return request(app)
             .get('/api/nonsense')
             .expect(404)
@@ -53,7 +53,7 @@ describe('/api/articles/:article_id', () => {
             .expect(200)
             .then(({ body }) => {
                 const { article } = body;
-                expect(article[0]).toEqual(
+                expect(article).toEqual(
                     expect.objectContaining({
                         author: expect.any(String),
                         title: expect.any(String),
@@ -65,5 +65,21 @@ describe('/api/articles/:article_id', () => {
                     })
                 );
             });
-    })  ;
+    });
+    test('GET:400 sends appropriate status and error message when given an invalid id', () => {
+        return request(app)
+            .get('/api/articles/not-an-article')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('GET:404 sends appropriate status and error message when given a valid but non-existent id', () => {
+        return request(app)
+            .get('/api/articles/3141')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Article does not exist')
+            })
+    });
 });
