@@ -2,6 +2,7 @@ const {
     selectTopics,
     selectArticleById,
     updateArticleById,
+    selectUsers,
 } = require('../models/topics-models.js');
 
 exports.getTopics = (req, res, next) => {
@@ -9,6 +10,12 @@ exports.getTopics = (req, res, next) => {
         res.status(200).send({ topics });
     });
 };
+
+exports.getUsers = (req, res, next) => {
+    selectUsers().then((users) => {
+        res.status(200).send({ users });
+    })
+}
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
