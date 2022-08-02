@@ -107,7 +107,31 @@ describe('/api/articles/:article_id', () => {
             .send(blankUpdate)
             .expect(400)
             .then(({body}) => {
-                expect(body.msg).toBe("inc_votes undefined")
+                expect(body.msg).toBe("Votes undefined")
             });
+    });
+    test('PATCH:400 sends error message when given an invalid id', () => {
+        const newVotes = {
+            'inc_votes': 6
+        };
+        return request(app)
+            .patch('/api/articles/not-an-article')
+            .send(newVotes)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('PATCH:404 sends error message when given a valid but non-existent id', () => {
+        const newVotes = {
+            'inc_votes': 6
+        };
+        return request(app)
+            .patch('/api/articles/3141')
+            .send(newVotes)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Article does not exist')
+            })
     });
 });

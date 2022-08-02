@@ -25,10 +25,12 @@ exports.patchArticleById = (req, res, next) => {
     if (inc_votes) {
         updateArticleById(inc_votes, article_id).then((article) => {
             res.status(200).send({ article });
-        });
+        }).catch((err) => {
+            next(err);
+        })
     } else {
         res.status(400).send({
-            'msg': 'inc_votes undefined'
+            'msg': 'Votes undefined'
         });
     }
 };
