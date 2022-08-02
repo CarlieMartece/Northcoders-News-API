@@ -20,17 +20,12 @@ describe('/api/topics', () => {
             .then(({ body }) => {
                 const { topics } = body;
                 expect(topics).toEqual(expect.any(Array));
-                expect(Object.keys(topics[0])).toEqual(
-                    expect.arrayContaining(['slug', 'description'])
+                expect(topics[0]).toEqual(
+                    expect.objectContaining({
+                        slug: expect.any(String),
+                        description: expect.any(String),
+                    })
                 );
-                topics.forEach((topic) => {
-                    expect(topic).toEqual(
-                        expect.objectContaining({
-                            slug: expect.any(String),
-                            description: expect.any(String),
-                        })
-                    );
-                });
             });
     });
 });
