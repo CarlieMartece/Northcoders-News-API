@@ -14,22 +14,14 @@ exports.selectUsers = () => {
 
 exports.selectArticleById = (article_id) => {
     return db
-        .query('SELECT * FROM articles WHERE article_id = $1;', [article_id])
-        .then(({ rows: [article] }) => {
-            if (article === undefined) {
+        .query('SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.body, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1;', [article_id])
+        .then(({ rows }) => {
+            if (!rows[0]) {
                 return Promise.reject({ status: 404, msg: "Article does not exist" })
             };
-            return article;
-        })
-};
-
-exports.selectCommentsByArticle = (article_id) => {
-    return db
-        .query('SELECT * FROM comments WHERE article_id = $1;', [article_id])
-        .then(({ rows }) => {
             return rows;
         })
-}
+};
 
 exports.updateArticleById = (inc_votes, article_id) => {
     return db

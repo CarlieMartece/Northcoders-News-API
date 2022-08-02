@@ -20,20 +20,15 @@ exports.getUsers = (req, res, next) => {
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
-    const selectArticle = selectArticleById(article_id);
-    const selectComments = selectCommentsByArticle(article_id);
-    Promise.all([selectArticle, selectComments])
-        .then((values) => {
-            const articleWithoutCommentCount = values[0];
-            const commentCount = values[1].length;
-            const article = {
-                ...articleWithoutCommentCount,
-                comment_count: commentCount, 
-            }
-            res.status(200).send({ article });
-        }).catch((err) => {
-            next(err);
-        });
+    selectArticleById(article_id).then((articleArray) => {
+        const article = {
+            ...articleArray[0],
+            comment_count: articleArray.length, 
+        }
+        res.status(200).send({ article });
+    }).catch((err) => {
+        next(err);
+    });
 };
 
 exports.patchArticleById = (req, res, next) => {
