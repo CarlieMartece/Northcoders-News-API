@@ -77,4 +77,27 @@ describe('/api/articles/:article_id', () => {
                 expect(response.body.msg).toBe('Article does not exist')
             })
     });
+    test('PATCH:200 updates votes property and responds with updated article', () => {
+        const newVotes = {
+            'inc_votes': 6
+        };
+        return request(app)
+            .patch('/api/articles/5')
+            .send(newVotes)
+            .expect(200)
+            .then(({body}) => {
+                const { article } = body;
+                expect(article).toEqual(
+                    expect.objectContaining({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: 6,
+                    })
+                );
+            })
+    });
 });
