@@ -17,22 +17,64 @@ describe('/api/topics', () => {
         return request(app)
             .get('/api/topics')
             .expect(200)
-            .then((response) => {
-                expect(response.body.topics).toEqual(expect.any(Array));
-                expect(Object.keys(response.body.topics[0])).toEqual(
-                    expect.arrayContaining(['slug', 'description'])
+            .then(({ body }) => {
+                const { topics } = body;
+                expect(topics).toEqual(expect.any(Array));
+                expect(topics[0]).toEqual(
+                    expect.objectContaining({
+                        slug: expect.any(String),
+                        description: expect.any(String),
+                    })
                 );
-            })
+            });
     });
 });
 
 describe('handles all bad URLs', () => {
-    test('GET:404 bad path response for all bad urls', () => {
+    test('GET:404 sends bad path response for all bad urls', () => {
         return request(app)
             .get('/api/nonsense')
             .expect(404)
             .then(({body}) => {
                 expect(body.msg).toBe('bad path');
             });
+    });
+});
+
+describe('/api/articles/:article_id', () => {
+    test('GET:200 sends a single article to the client', () => {
+        return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+                const { article } = body;
+                expect(article).toEqual(
+                    expect.objectContaining({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                    })
+                );
+            });
+    });
+    test('GET:400 sends appropriate status and error message when given an invalid id', () => {
+        return request(app)
+            .get('/api/articles/not-an-article')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('GET:404 sends appropriate status and error message when given a valid but non-existent id', () => {
+        return request(app)
+            .get('/api/articles/3141')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Article does not exist')
+            })
     });
 });
