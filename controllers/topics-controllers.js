@@ -22,7 +22,13 @@ exports.getArticleById = (req, res, next) => {
 exports.patchArticleById = (req, res, next) => {
     const { article_id } = req.params;
     const { inc_votes } = req.body;
-    updateArticleById(inc_votes, article_id).then((article) => {
-        res.status(200).send({ article });
-    });
+    if (inc_votes) {
+        updateArticleById(inc_votes, article_id).then((article) => {
+            res.status(200).send({ article });
+        });
+    } else {
+        res.status(400).send({
+            'msg': 'inc_votes undefined'
+        });
+    }
 };

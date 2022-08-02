@@ -100,4 +100,14 @@ describe('/api/articles/:article_id', () => {
                 );
             })
     });
+    test('PATCH:400 sends error message when given empty object', () => {
+        const blankUpdate = {};
+        return request(app)
+            .patch('/api/articles/3')
+            .send(blankUpdate)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe("inc_votes undefined")
+            });
+    });
 });
