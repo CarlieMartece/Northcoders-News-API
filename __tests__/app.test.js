@@ -61,6 +61,18 @@ describe('/api/articles/:article_id', () => {
                 );
             });
     });
+    test('GET:200 responds with object containing comment count', () => {
+        return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.article).toEqual(
+                    expect.objectContaining({
+                        comment_count: expect.any(Number),
+                    })
+                );
+            });
+    });
     test('GET:400 sends appropriate status and error message when given an invalid id', () => {
         return request(app)
             .get('/api/articles/not-an-article')

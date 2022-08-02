@@ -3,6 +3,7 @@ const {
     selectArticleById,
     updateArticleById,
     selectUsers,
+    selectCommentsByArticle,
 } = require('../models/topics-models.js');
 
 exports.getTopics = (req, res, next) => {
@@ -19,11 +20,20 @@ exports.getUsers = (req, res, next) => {
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
-    selectArticleById(article_id).then((article) => {
-        res.status(200).send({ article });
-    }).catch((err) => {
-        next(err);
-    });
+    const selectArticle = selectArticleById(article_id);
+    const selectComments = selectCommentsByArticle(article_id);
+    Promise.all([selectArticle, selectComments])
+        .then((values) => {
+            const articleWithoutCommentCount = values[0];
+            const commentCount = values[1].length;
+            const article = {
+                ...articleWithoutCommentCount,
+                comment_count: commentCount, 
+            }
+            res.status(200).send({ article });
+        }).catch((err) => {
+            next(err);
+        });
 };
 
 exports.patchArticleById = (req, res, next) => {
