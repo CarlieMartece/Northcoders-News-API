@@ -1,16 +1,13 @@
 const db = require('../db/connection');
 
-exports.selectTopics = () => {
-    return db.query('SELECT * FROM topics;').then((result) => {
-        return result.rows;
-    });
-};
 
-exports.selectUsers = () => {
-    return db.query('SELECT * FROM users;').then((result) => {
-        return result.rows;
-    });
-}
+exports.selectArticles = () => {
+    return db
+        .query('SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ORDER BY articles.created_at DESC;')
+        .then(({ rows }) => {
+            return rows;
+        })
+};
 
 exports.selectArticleById = (article_id) => {
     return db
@@ -33,3 +30,17 @@ exports.updateArticleById = (inc_votes, article_id) => {
             return article;
         })
 };
+
+
+exports.selectTopics = () => {
+    return db.query('SELECT * FROM topics;').then((result) => {
+        return result.rows;
+    });
+};
+
+
+exports.selectUsers = () => {
+    return db.query('SELECT * FROM users;').then((result) => {
+        return result.rows;
+    });
+}

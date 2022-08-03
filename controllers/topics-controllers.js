@@ -1,22 +1,33 @@
 const {
-    selectTopics,
+    selectArticles,
     selectArticleById,
     updateArticleById,
+    selectTopics,
     selectUsers,
-    selectCommentsByArticle,
 } = require('../models/topics-models.js');
 
-exports.getTopics = (req, res, next) => {
-    selectTopics().then((topics) => {
-        res.status(200).send({ topics });
-    });
-};
 
-exports.getUsers = (req, res, next) => {
-    selectUsers().then((users) => {
-        res.status(200).send({ users });
+exports.getArticles = (req, res, next) => {
+    selectArticles().then((articleArray) => {
+        const idArray = [];
+        articleArray.forEach((article) => {
+            idArray.push(article.article_id);
+        })
+        function getCount(array, value) {
+            return array.filter((v) => (v === value)).length;
+        }
+        const articles = [articleArray[0]]
+        articleArray.forEach((article) => {
+            if (article.article_id !== articles[0].article_id) {
+                articles.unshift(article)
+            }
+        })
+        articles.forEach((article) => {
+            article.comment_count = getCount(idArray, article.article_id);
+        })
+        res.status(200).send({ articles });
     })
-}
+};
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
@@ -46,3 +57,17 @@ exports.patchArticleById = (req, res, next) => {
         });
     }
 };
+
+
+exports.getTopics = (req, res, next) => {
+    selectTopics().then((topics) => {
+        res.status(200).send({ topics });
+    });
+};
+
+
+exports.getUsers = (req, res, next) => {
+    selectUsers().then((users) => {
+        res.status(200).send({ users });
+    })
+}
