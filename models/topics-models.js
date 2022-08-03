@@ -3,7 +3,7 @@ const db = require('../db/connection');
 
 exports.selectArticles = () => {
     return db
-        .query('SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ORDER BY articles.created_at DESC;')
+        .query('SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ORDER BY articles.created_at ASC;')
         .then(({ rows }) => {
             return rows;
         })
