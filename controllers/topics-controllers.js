@@ -1,30 +1,27 @@
 const {
-    selectTopics,
+    selectArticles,
     selectArticleById,
     updateArticleById,
+    selectTopics,
     selectUsers,
-    selectCommentsByArticle,
 } = require('../models/topics-models.js');
 
-exports.getTopics = (req, res, next) => {
-    selectTopics().then((topics) => {
-        res.status(200).send({ topics });
-    });
-};
 
-exports.getUsers = (req, res, next) => {
-    selectUsers().then((users) => {
-        res.status(200).send({ users });
+exports.getArticles = (req, res, next) => {
+    selectArticles().then((articles) => {
+        articles.forEach((article) => {
+            article.comment_count = Number(article.count);
+            delete article.count;
+        })
+        res.status(200).send({ articles });
     })
-}
+};
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
-    selectArticleById(article_id).then((articleArray) => {
-        const article = {
-            ...articleArray[0],
-            comment_count: articleArray.length, 
-        }
+    selectArticleById(article_id).then((article) => {
+        article.comment_count = Number(article.count);
+        delete article.count;
         res.status(200).send({ article });
     }).catch((err) => {
         next(err);
@@ -46,3 +43,17 @@ exports.patchArticleById = (req, res, next) => {
         });
     }
 };
+
+
+exports.getTopics = (req, res, next) => {
+    selectTopics().then((topics) => {
+        res.status(200).send({ topics });
+    });
+};
+
+
+exports.getUsers = (req, res, next) => {
+    selectUsers().then((users) => {
+        res.status(200).send({ users });
+    })
+}

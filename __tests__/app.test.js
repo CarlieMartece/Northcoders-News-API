@@ -12,23 +12,6 @@ beforeEach(() => {
     return seed(data);
 })
 
-describe('/api/topics', () => {
-    test('GET:200 sends an array of topic objects with required properties', () => {
-        return request(app)
-            .get('/api/topics')
-            .expect(200)
-            .then(({ body }) => {
-                const { topics } = body;
-                expect(topics).toEqual(expect.any(Array));
-                expect(topics[0]).toEqual(
-                    expect.objectContaining({
-                        slug: expect.any(String),
-                        description: expect.any(String),
-                    })
-                );
-            });
-    });
-});
 
 describe('handles all bad URLs', () => {
     test('GET:404 sends bad path response for all bad urls', () => {
@@ -38,6 +21,33 @@ describe('handles all bad URLs', () => {
             .then(({body}) => {
                 expect(body.msg).toBe('bad path');
             });
+    });
+});
+
+
+describe('/api/articles', () => {
+    test('GET:200 sends an array of article objects with required properties', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;
+                expect(articles).toEqual(expect.any(Array));
+                expect(articles[0]).toEqual(
+                    expect.objectContaining({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        comment_count: expect.any(Number),
+                    })
+                )
+                expect(articles).toBeSortedBy('created_at', {
+                    descending: true,
+                });
+            })
     });
 });
 
@@ -147,6 +157,26 @@ describe('/api/articles/:article_id', () => {
             })
     });
 });
+
+
+describe('/api/topics', () => {
+    test('GET:200 sends an array of topic objects with required properties', () => {
+        return request(app)
+            .get('/api/topics')
+            .expect(200)
+            .then(({ body }) => {
+                const { topics } = body;
+                expect(topics).toEqual(expect.any(Array));
+                expect(topics[0]).toEqual(
+                    expect.objectContaining({
+                        slug: expect.any(String),
+                        description: expect.any(String),
+                    })
+                );
+            });
+    });
+});
+
 
 describe('/api/users', () => {
     test('GET:200 responds with an array of user objects with required properties', () => {
