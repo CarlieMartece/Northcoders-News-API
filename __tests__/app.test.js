@@ -43,7 +43,7 @@ describe('/api/articles', () => {
                         votes: expect.any(Number),
                         comment_count: expect.any(Number),
                     })
-                )
+                );
                 expect(articles).toBeSortedBy('created_at', {
                     descending: true,
                 });
@@ -166,16 +166,21 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(200)
             .then(({ body }) => {
                 const { comments } = body;
-                expect(comments).toEqual(expect.any(Array));
-                expect(comments[0]).toEqual(
-                    expect.objectContaining({
-                        comment_id: expect.any(Number),
-                        votes: expect.any(Number),
-                        created_at: expect.any(String),
-                        author: expect.any(String),
-                        body: expect.any(String),
-                    })
-                );
+                expect(comments).toBeInstanceOf(Array);
+                expect(comments).toHaveLength(8);
+                if(comments.length > 0) {
+                    comments.forEach((comment) => {
+                        expect(comment).toEqual(
+                            expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            })
+                        );
+                    });
+                };
             });
     });
     test('GET:400 sends appropriate status and error message when given an invalid id', () => {
