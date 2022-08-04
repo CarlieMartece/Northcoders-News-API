@@ -9,7 +9,8 @@ const {
 
 
 exports.getArticles = (req, res, next) => {
-    selectArticles().then((articles) => {
+    const queries = req.query;
+    selectArticles(queries).then((articles) => {
         articles.forEach((article) => {
             article.comment_count = Number(article.count);
             delete article.count;

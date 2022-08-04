@@ -49,6 +49,47 @@ describe('/api/articles', () => {
                 });
             })
     });
+    test('GET:200 sends an array of article objects with sort-by query', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeSortedBy('author', {
+                    descending: true,
+                });
+            });
+    });
+    test('GET:200 sends an array of article objects with order-by query', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author&order_by=asc')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeSortedBy('author', {
+                    ascending: true,
+                });
+            });
+    });
+    test('GET:200 sends an array of article objects with topic query', () => {
+        return request(app)
+            .get('/api/articles?topic=coding')
+            .expect(200)
+            // .then(({ body }) => {
+            //     const { articles } = body;                
+            //     expect(articles).toBeInstanceOf(Array);
+            //     expect(articles).toHaveLength(8);
+            //     if(articles.length > 0) {
+            //         articles.forEach((article) => {
+            //             expect(article).toEqual(
+            //                 expect.objectContaining({
+            //                     topic: 'coding',
+            //                 })
+            //             );
+            //         });
+            //     };
+            // });
+    });
 });
 
 describe('/api/articles/:article_id', () => {

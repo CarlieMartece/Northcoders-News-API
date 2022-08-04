@@ -1,9 +1,21 @@
 const db = require('../db/connection');
 
 
-exports.selectArticles = () => {
+exports.selectArticles = (queries) => {
+    const queryBaseOne = 'SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id';
+    let filter = ' '
+    let array = [];
+    if (queries.topic) {
+        filter = ' WHERE articles.topic = $1';
+        array.push(queries.topic);
+    }
+    const queryBaseTwo =  ' GROUP BY articles.article_id, comments.article_id ORDER BY articles.';
+    const sort = queries.sort_by || 'created_at';
+    const order = queries.order_by || 'DESC;';
+    const queryString = queryBaseOne + filter + queryBaseTwo + sort + ' ' + order;
+    console.log(queryString)
     return db
-        .query('SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id, comments.article_id ORDER BY articles.created_at DESC;')
+        .query(queryString, array)
         .then(({ rows }) => {
             return rows;
         })
