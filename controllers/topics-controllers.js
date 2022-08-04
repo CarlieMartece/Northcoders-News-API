@@ -61,17 +61,11 @@ exports.postComment = (req, res, next) => {
         ...req.body,
         article_id,
     }
-    if (newComment.body) {
-        insertComment(newComment).then((comment) => {
-            res.status(201).send({ comment });
-        }).catch((err) => {
-            next(err);
-        });
-    } else {
-        res.status(400).send({
-            'msg': 'Comment undefined'
-        });
-    }
+    insertComment(newComment).then((comment) => {
+        res.status(201).send({ comment });
+    }).catch((err) => {
+        next(err);
+    });
 };
 
 

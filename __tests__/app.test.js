@@ -234,14 +234,28 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe('Invalid ID');
             });
     });
-    test('POST:400 sends error message when given empty object', () => {
-        const blankUpdate = {};
+    test('POST:400 sends error message when no comment provided', () => {
+        const blankBody = {
+            'username': 'jessjelly',
+        };
         return request(app)
             .post('/api/articles/3/comments')
-            .send(blankUpdate)
+            .send(blankBody)
             .expect(400)
             .then(({body}) => {
                 expect(body.msg).toBe("Comment undefined")
+            });
+    });
+    test('POST:404 sends error message when no username provided', () => {
+        const blankUser = {
+            'body': 'Ey up!',
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(blankUser)
+            .expect(404)
+            .then(({body}) => {
+                expect(body.msg).toBe("ID does not exist")
             });
     });
     test('POST:404 sends error message when given a valid but non-existent id', () => {
