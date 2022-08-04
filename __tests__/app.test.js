@@ -244,6 +244,32 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(body.msg).toBe("Comment undefined")
             });
     });
+    test('POST:404 sends error message when given a valid but non-existent id', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3141/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('ID does not exist')
+            })
+    });
+    test('POST:404 sends error message when given non-existent username', () => {
+        const newComment = {
+            'username': 'nookapocalypse',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('ID does not exist')
+            })
+    });
 });
 
 
