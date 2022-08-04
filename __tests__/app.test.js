@@ -221,6 +221,29 @@ describe('/api/articles/:article_id/comments', () => {
                 );
             });
     });
+    test('POST:400 sends error message when given an invalid article id', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+        .post('/api/articles/not-an-article/comments')
+        .send(newComment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('POST:400 sends error message when given empty object', () => {
+        const blankUpdate = {};
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(blankUpdate)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe("Comment undefined")
+            });
+    });
 });
 
 
