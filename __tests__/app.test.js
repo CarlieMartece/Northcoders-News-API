@@ -43,7 +43,7 @@ describe('/api/articles', () => {
                         votes: expect.any(Number),
                         comment_count: expect.any(Number),
                     })
-                )
+                );
                 expect(articles).toBeSortedBy('created_at', {
                     descending: true,
                 });
@@ -151,6 +151,49 @@ describe('/api/articles/:article_id', () => {
         return request(app)
             .patch('/api/articles/3141')
             .send(newVotes)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Article does not exist')
+            })
+    });
+});
+
+
+describe('/api/articles/:article_id/comments', () => {
+    test('GET:200 responds with an array of comment objects with required properties', () => {
+        return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body }) => {
+                const { comments } = body;
+                expect(comments).toBeInstanceOf(Array);
+                expect(comments).toHaveLength(8);
+                if(comments.length > 0) {
+                    comments.forEach((comment) => {
+                        expect(comment).toEqual(
+                            expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            })
+                        );
+                    });
+                };
+            });
+    });
+    test('GET:400 sends appropriate status and error message when given an invalid id', () => {
+        return request(app)
+            .get('/api/articles/not-an-article/comments')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('GET:404 sends appropriate status and error message when given a valid but non-existent id', () => {
+        return request(app)
+            .get('/api/articles/3141/comments')
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe('Article does not exist')

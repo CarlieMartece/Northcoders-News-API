@@ -31,6 +31,17 @@ exports.updateArticleById = (inc_votes, article_id) => {
         })
 };
 
+exports.selectCommentsByArticleId = (article_id) => {
+    return db
+        .query('SELECT * FROM comments WHERE article_id=$1;', [article_id])
+        .then(({ rows }) => {
+            if (!rows[0]) {
+                return Promise.reject({ status: 404, msg: "Article does not exist" })
+            };
+            return rows;
+        });
+};
+
 
 exports.selectTopics = () => {
     return db.query('SELECT * FROM topics;').then((result) => {
