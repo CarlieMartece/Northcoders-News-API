@@ -75,20 +75,41 @@ describe('/api/articles', () => {
         return request(app)
             .get('/api/articles?topic=coding')
             .expect(200)
-            // .then(({ body }) => {
-            //     const { articles } = body;                
-            //     expect(articles).toBeInstanceOf(Array);
-            //     expect(articles).toHaveLength(8);
-            //     if(articles.length > 0) {
-            //         articles.forEach((article) => {
-            //             expect(article).toEqual(
-            //                 expect.objectContaining({
-            //                     topic: 'coding',
-            //                 })
-            //             );
-            //         });
-            //     };
-            // });
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeInstanceOf(Array);
+                if(articles.length > 0) {
+                    articles.forEach((article) => {
+                        expect(article).toEqual(
+                            expect.objectContaining({
+                                author: expect.any(String),
+                                title: expect.any(String),
+                                article_id: expect.any(Number),
+                                topic: 'coding',
+                                created_at: expect.any(String),
+                                votes: expect.any(Number),
+                                comment_count: expect.any(Number),
+                            })
+                        );
+                    });
+                };
+            });
+    });
+    test('GET:400 sends error response for invalid column', () => {
+        return request(app)
+            .get('/api/articles?sort_by=not_a_column')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid column');
+            });
+    });
+    test('GET:400 sends error response for invalid topic', () => {
+        return request(app)
+            .get('/api/articles?topic=not-a-topic')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('No articles on this topic');
+            });
     });
 });
 
@@ -209,19 +230,17 @@ describe('/api/articles/:article_id/comments', () => {
                 const { comments } = body;
                 expect(comments).toBeInstanceOf(Array);
                 expect(comments).toHaveLength(8);
-                if(comments.length > 0) {
-                    comments.forEach((comment) => {
-                        expect(comment).toEqual(
-                            expect.objectContaining({
-                            comment_id: expect.any(Number),
-                            votes: expect.any(Number),
-                            created_at: expect.any(String),
-                            author: expect.any(String),
-                            body: expect.any(String),
-                            })
-                        );
-                    });
-                };
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        })
+                    );
+                });
             });
     });
     test('GET:400 sends appropriate status and error message when given an invalid id', () => {

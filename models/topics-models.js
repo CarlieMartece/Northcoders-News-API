@@ -2,21 +2,21 @@ const db = require('../db/connection');
 
 
 exports.selectArticles = (queries) => {
-    const queryBaseOne = 'SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id';
     let filter = ' '
     let array = [];
     if (queries.topic) {
         filter = ' WHERE articles.topic = $1';
         array.push(queries.topic);
     }
-    const queryBaseTwo =  ' GROUP BY articles.article_id, comments.article_id ORDER BY articles.';
     const sort = queries.sort_by || 'created_at';
-    const order = queries.order_by || 'DESC;';
-    const queryString = queryBaseOne + filter + queryBaseTwo + sort + ' ' + order;
-    console.log(queryString)
+    const order = queries.order_by || 'DESC;';    
+    const queryString = `SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ${filter} GROUP BY articles.article_id, comments.article_id ORDER BY articles.${sort} ${order}`;
     return db
         .query(queryString, array)
         .then(({ rows }) => {
+            if (!rows[0]) {
+                return Promise.reject({ status: 400, msg: "No articles on this topic" })
+            };
             return rows;
         })
 };

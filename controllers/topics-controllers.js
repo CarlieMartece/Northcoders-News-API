@@ -16,7 +16,9 @@ exports.getArticles = (req, res, next) => {
             delete article.count;
         })
         res.status(200).send({ articles });
-    })
+    }).catch((err) => {
+        next(err);
+    });
 };
 
 exports.getArticleById = (req, res, next) => {
