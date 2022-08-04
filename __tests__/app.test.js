@@ -199,6 +199,28 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe('Article does not exist')
             })
     });
+    test('POST:200 adds comment and responds with posted comment', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                expect(body.comment[0]).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        body: 'It were reet',
+                        votes: expect.any(Number),
+                        author: 'jessjelly',
+                        article_id: 3,
+                        created_at: expect.any(String),
+                    })
+                );
+            });
+    });
 });
 
 
