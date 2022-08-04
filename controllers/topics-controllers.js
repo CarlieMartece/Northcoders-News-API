@@ -8,22 +8,10 @@ const {
 
 
 exports.getArticles = (req, res, next) => {
-    selectArticles().then((articleArray) => {
-        const idArray = [];
-        articleArray.forEach((article) => {
-            idArray.push(article.article_id);
-        })
-        function getCount(array, value) {
-            return array.filter((v) => (v === value)).length;
-        }
-        const articles = [articleArray[0]]
-        articleArray.forEach((article) => {
-            if (article.article_id !== articles[0].article_id) {
-                articles.unshift(article)
-            }
-        })
+    selectArticles().then((articles) => {
         articles.forEach((article) => {
-            article.comment_count = getCount(idArray, article.article_id);
+            article.comment_count = Number(article.count);
+            delete article.count;
         })
         res.status(200).send({ articles });
     })
@@ -31,11 +19,9 @@ exports.getArticles = (req, res, next) => {
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
-    selectArticleById(article_id).then((articleArray) => {
-        const article = {
-            ...articleArray[0],
-            comment_count: articleArray.length, 
-        }
+    selectArticleById(article_id).then((article) => {
+        article.comment_count = Number(article.count);
+        delete article.count;
         res.status(200).send({ article });
     }).catch((err) => {
         next(err);
