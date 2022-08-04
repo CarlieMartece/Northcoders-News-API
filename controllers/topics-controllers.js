@@ -2,6 +2,7 @@ const {
     selectArticles,
     selectArticleById,
     updateArticleById,
+    selectCommentsByArticleId,
     selectTopics,
     selectUsers,
 } = require('../models/topics-models.js');
@@ -42,6 +43,15 @@ exports.patchArticleById = (req, res, next) => {
             'msg': 'Votes undefined'
         });
     }
+};
+
+exports.getCommentsByArticleId = (req, res, next) => {
+    const {article_id} = req.params;
+    selectCommentsByArticleId(article_id).then((comments) => {
+        res.status(200).send({ comments });
+    }).catch((err) => {
+        next(err);
+    });
 };
 
 

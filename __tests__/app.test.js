@@ -159,6 +159,28 @@ describe('/api/articles/:article_id', () => {
 });
 
 
+describe('/api/articles/:article_id/comments', () => {
+    test('GET:200 responds with an array of comment objects with required properties', () => {
+        return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body }) => {
+                const { comments } = body;
+                expect(comments).toEqual(expect.any(Array));
+                expect(comments[0]).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                    })
+                );
+            });
+    });
+});
+
+
 describe('/api/topics', () => {
     test('GET:200 sends an array of topic objects with required properties', () => {
         return request(app)
