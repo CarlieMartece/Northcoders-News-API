@@ -49,6 +49,76 @@ describe('/api/articles', () => {
                 });
             })
     });
+    test('GET:200 sends an array of article objects with sort-by query', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeSortedBy('author', {
+                    descending: true,
+                });
+            });
+    });
+    test('GET:200 sends an array of article objects with order-by query', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author&order_by=asc')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeSortedBy('author', {
+                    ascending: true,
+                });
+            });
+    });
+    test('GET:200 sends an array of article objects with topic query', () => {
+        return request(app)
+            .get('/api/articles?topic=coding')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeInstanceOf(Array);
+                if(articles.length > 0) {
+                    articles.forEach((article) => {
+                        expect(article).toEqual(
+                            expect.objectContaining({
+                                author: expect.any(String),
+                                title: expect.any(String),
+                                article_id: expect.any(Number),
+                                topic: 'coding',
+                                created_at: expect.any(String),
+                                votes: expect.any(Number),
+                                comment_count: expect.any(Number),
+                            })
+                        );
+                    });
+                };
+            });
+    });
+    test('GET:400 sends error response for invalid column', () => {
+        return request(app)
+            .get('/api/articles?sort_by=not_a_column')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid sort column');
+            });
+    });
+    test('GET:400 sends error response for invalid order', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author&order_by=cats')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid order');
+            });
+    });
+    test('GET:400 sends error response for invalid topic', () => {
+        return request(app)
+            .get('/api/articles?topic=not-a-topic')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('No articles on this topic');
+            });
+    });
 });
 
 describe('/api/articles/:article_id', () => {
@@ -168,19 +238,17 @@ describe('/api/articles/:article_id/comments', () => {
                 const { comments } = body;
                 expect(comments).toBeInstanceOf(Array);
                 expect(comments).toHaveLength(8);
-                if(comments.length > 0) {
-                    comments.forEach((comment) => {
-                        expect(comment).toEqual(
-                            expect.objectContaining({
-                            comment_id: expect.any(Number),
-                            votes: expect.any(Number),
-                            created_at: expect.any(String),
-                            author: expect.any(String),
-                            body: expect.any(String),
-                            })
-                        );
-                    });
-                };
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        })
+                    );
+                });
             });
     });
     test('GET:400 sends appropriate status and error message when given an invalid id', () => {
