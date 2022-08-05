@@ -33,8 +33,6 @@ app.all('*', (req, res) => {
 app.use((err, req, res, next) => {
     if (err.code === '22P02') {
         res.status(400).send({ msg: 'Invalid ID' })
-    } else if (err.code === '42703') {
-        res.status(400).send({ msg: 'Invalid column' });
     } else {
         res.status(err.status).send({ msg: err.msg })
     }

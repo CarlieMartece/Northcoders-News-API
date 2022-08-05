@@ -9,8 +9,17 @@ exports.selectArticles = (queries) => {
         array.push(queries.topic);
     }
     const sort = queries.sort_by || 'created_at';
-    const order = queries.order_by || 'DESC;';    
-    const queryString = `SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ${filter} GROUP BY articles.article_id, comments.article_id ORDER BY articles.${sort} ${order}`;
+    const validSorts = ['article_id', 'title', 'topic', 'author', 'created_at', 'votes']
+    if (validSorts.indexOf(sort) === -1) {
+        return Promise.reject({ status: 400, msg: "Invalid sort column" })
+    };
+    const getOrder = queries.order_by || 'DESC';
+    const order = getOrder.toUpperCase();
+    const validOrders = ['ASC', 'DESC']
+    if (validOrders.indexOf(order) === -1) {
+        return Promise.reject({ status: 400, msg: "Invalid order" })
+    }
+    const queryString = `SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ${filter} GROUP BY articles.article_id, comments.article_id ORDER BY articles.${sort} ${order};`;
     return db
         .query(queryString, array)
         .then(({ rows }) => {

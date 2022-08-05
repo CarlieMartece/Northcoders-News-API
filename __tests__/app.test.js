@@ -100,7 +100,15 @@ describe('/api/articles', () => {
             .get('/api/articles?sort_by=not_a_column')
             .expect(400)
             .then((response) => {
-                expect(response.body.msg).toBe('Invalid column');
+                expect(response.body.msg).toBe('Invalid sort column');
+            });
+    });
+    test('GET:400 sends error response for invalid order', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author&order_by=cats')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid order');
             });
     });
     test('GET:400 sends error response for invalid topic', () => {
