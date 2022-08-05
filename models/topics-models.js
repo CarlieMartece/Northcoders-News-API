@@ -43,15 +43,13 @@ exports.selectCommentsByArticleId = (article_id) => {
 };
 
 exports.insertComment = (newComment) => {
-    const author = newComment.username || 'blank';
-    const body = newComment.body || 'blank';
-    const queryArray = [author, body, newComment.article_id];
+    const { username, body, article_id } = newComment;
+    if(!username || !body){
+        return Promise.reject({ status: 400, msg: "Insufficient info" })
+        }
     return db
-        .query('INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;', queryArray)
+        .query('INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;', [username, body, article_id])
         .then(({ rows }) => {
-            if (rows[0].body === 'blank') {
-                return Promise.reject({ status: 400, msg: "Comment undefined" })
-            }
             return rows;
         });
 };
