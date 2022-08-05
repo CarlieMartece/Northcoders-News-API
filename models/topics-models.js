@@ -42,6 +42,18 @@ exports.selectCommentsByArticleId = (article_id) => {
         });
 };
 
+exports.insertComment = (newComment) => {
+    const { username, body, article_id } = newComment;
+    if(!username || !body){
+        return Promise.reject({ status: 400, msg: "Insufficient info" })
+        }
+    return db
+        .query('INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;', [username, body, article_id])
+        .then(({ rows }) => {
+            return rows;
+        });
+};
+
 
 exports.selectTopics = () => {
     return db.query('SELECT * FROM topics;').then((result) => {

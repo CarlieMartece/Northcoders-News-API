@@ -199,6 +199,91 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe('Article does not exist')
             })
     });
+    test('POST:200 adds comment and responds with posted comment', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                expect(body.comment[0]).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        body: 'It were reet',
+                        votes: expect.any(Number),
+                        author: 'jessjelly',
+                        article_id: 3,
+                        created_at: expect.any(String),
+                    })
+                );
+            });
+    });
+    test('POST:400 sends error message when given an invalid article id', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+        .post('/api/articles/not-an-article/comments')
+        .send(newComment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('POST:400 sends error message when no comment provided', () => {
+        const blankBody = {
+            'username': 'jessjelly',
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(blankBody)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe("Insufficient info")
+            });
+    });
+    test('POST:400 sends error message when no username provided', () => {
+        const blankUser = {
+            'body': 'Ey up!',
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(blankUser)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe("Insufficient info")
+            });
+    });
+    test('POST:404 sends error message when given a valid but non-existent id', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3141/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('ID does not exist')
+            })
+    });
+    test('POST:404 sends error message when given non-existent username', () => {
+        const newComment = {
+            'username': 'nookapocalypse',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('ID does not exist')
+            })
+    });
 });
 
 
