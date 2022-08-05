@@ -3,6 +3,7 @@ const app = require('../app.js');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const data = require('../db/data/development-data/');
+const { response } = require('../app.js');
 
 afterAll (() => {
     return db.end();
@@ -202,16 +203,17 @@ describe('/api/articles/:article_id/comments', () => {
 });
 
 
-// describe('/api/comments/:comment_id', () => {
-//     test('DELETE:204: deletes comment and responds with no content', () => {
-//         return request(app)
-//             .delete('/api/comments/42')
-//             .expect(204)
-//             // .then((response) => {
-//             //     expect(response.body.msg).toBe('Comment does not exist')
-//             // });
-//     });
-// });
+describe('/api/comments/:comment_id', () => {
+    test('DELETE:204: deletes comment and responds with no content', () => {
+        return request(app)
+            .delete('/api/comments/42')
+            .expect(204)
+            .then(({ body }) => {
+                const { content } = body;
+                expect(content).toBe(undefined)
+            });
+    });
+});
 
 
 describe('/api/topics', () => {
