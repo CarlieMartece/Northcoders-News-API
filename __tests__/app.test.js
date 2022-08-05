@@ -49,6 +49,76 @@ describe('/api/articles', () => {
                 });
             })
     });
+    test('GET:200 sends an array of article objects with sort-by query', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeSortedBy('author', {
+                    descending: true,
+                });
+            });
+    });
+    test('GET:200 sends an array of article objects with order-by query', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author&order_by=asc')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeSortedBy('author', {
+                    ascending: true,
+                });
+            });
+    });
+    test('GET:200 sends an array of article objects with topic query', () => {
+        return request(app)
+            .get('/api/articles?topic=coding')
+            .expect(200)
+            .then(({ body }) => {
+                const { articles } = body;                
+                expect(articles).toBeInstanceOf(Array);
+                if(articles.length > 0) {
+                    articles.forEach((article) => {
+                        expect(article).toEqual(
+                            expect.objectContaining({
+                                author: expect.any(String),
+                                title: expect.any(String),
+                                article_id: expect.any(Number),
+                                topic: 'coding',
+                                created_at: expect.any(String),
+                                votes: expect.any(Number),
+                                comment_count: expect.any(Number),
+                            })
+                        );
+                    });
+                };
+            });
+    });
+    test('GET:400 sends error response for invalid column', () => {
+        return request(app)
+            .get('/api/articles?sort_by=not_a_column')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid sort column');
+            });
+    });
+    test('GET:400 sends error response for invalid order', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author&order_by=cats')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid order');
+            });
+    });
+    test('GET:400 sends error response for invalid topic', () => {
+        return request(app)
+            .get('/api/articles?topic=not-a-topic')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('No articles on this topic');
+            });
+    });
 });
 
 describe('/api/articles/:article_id', () => {
@@ -168,19 +238,17 @@ describe('/api/articles/:article_id/comments', () => {
                 const { comments } = body;
                 expect(comments).toBeInstanceOf(Array);
                 expect(comments).toHaveLength(8);
-                if(comments.length > 0) {
-                    comments.forEach((comment) => {
-                        expect(comment).toEqual(
-                            expect.objectContaining({
-                            comment_id: expect.any(Number),
-                            votes: expect.any(Number),
-                            created_at: expect.any(String),
-                            author: expect.any(String),
-                            body: expect.any(String),
-                            })
-                        );
-                    });
-                };
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        author: expect.any(String),
+                        body: expect.any(String),
+                        })
+                    );
+                });
             });
     });
     test('GET:400 sends appropriate status and error message when given an invalid id', () => {
@@ -227,6 +295,91 @@ describe('/api/comments/:comment_id', () => {
             .then((response) => {
                 expect(response.body.msg).toBe("Comment does not exist")
             });
+    });
+    test('POST:200 adds comment and responds with posted comment', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                expect(body.comment[0]).toEqual(
+                    expect.objectContaining({
+                        comment_id: expect.any(Number),
+                        body: 'It were reet',
+                        votes: expect.any(Number),
+                        author: 'jessjelly',
+                        article_id: 3,
+                        created_at: expect.any(String),
+                    })
+                );
+            });
+    });
+    test('POST:400 sends error message when given an invalid article id', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+        .post('/api/articles/not-an-article/comments')
+        .send(newComment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid ID');
+            });
+    });
+    test('POST:400 sends error message when no comment provided', () => {
+        const blankBody = {
+            'username': 'jessjelly',
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(blankBody)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe("Insufficient info")
+            });
+    });
+    test('POST:400 sends error message when no username provided', () => {
+        const blankUser = {
+            'body': 'Ey up!',
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(blankUser)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe("Insufficient info")
+            });
+    });
+    test('POST:404 sends error message when given a valid but non-existent id', () => {
+        const newComment = {
+            'username': 'jessjelly',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3141/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('ID does not exist')
+            })
+    });
+    test('POST:404 sends error message when given non-existent username', () => {
+        const newComment = {
+            'username': 'nookapocalypse',
+            'body': 'It were reet'
+        };
+        return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('ID does not exist')
+            })
     });
 });
 

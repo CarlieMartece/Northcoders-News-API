@@ -3,6 +3,7 @@ const {
     selectArticleById,
     updateArticleById,
     selectCommentsByArticleId,
+    insertComment,
     deleteCommentById,
     selectTopics,
     selectUsers,
@@ -10,13 +11,16 @@ const {
 
 
 exports.getArticles = (req, res, next) => {
-    selectArticles().then((articles) => {
+    const queries = req.query;
+    selectArticles(queries).then((articles) => {
         articles.forEach((article) => {
             article.comment_count = Number(article.count);
             delete article.count;
         })
         res.status(200).send({ articles });
-    })
+    }).catch((err) => {
+        next(err);
+    });
 };
 
 exports.getArticleById = (req, res, next) => {
@@ -54,6 +58,20 @@ exports.getCommentsByArticleId = (req, res, next) => {
         next(err);
     });
 };
+
+exports.postComment = (req, res, next) => {
+    const { article_id } = req.params;
+    const newComment = {
+        ...req.body,
+        article_id,
+    }
+    insertComment(newComment).then((comment) => {
+        res.status(201).send({ comment });
+    }).catch((err) => {
+        next(err);
+    });
+};
+
 
 exports.removeCommentById = (req, res, next) => {
     const {comment_id} = req.params;

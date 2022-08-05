@@ -1,10 +1,31 @@
 const db = require('../db/connection');
 
 
-exports.selectArticles = () => {
+exports.selectArticles = (queries) => {
+    let filter = ' '
+    let array = [];
+    if (queries.topic) {
+        filter = ' WHERE articles.topic = $1';
+        array.push(queries.topic);
+    }
+    const sort = queries.sort_by || 'created_at';
+    const validSorts = ['article_id', 'title', 'topic', 'author', 'created_at', 'votes']
+    if (validSorts.indexOf(sort) === -1) {
+        return Promise.reject({ status: 400, msg: "Invalid sort column" })
+    };
+    const getOrder = queries.order_by || 'DESC';
+    const order = getOrder.toUpperCase();
+    const validOrders = ['ASC', 'DESC']
+    if (validOrders.indexOf(order) === -1) {
+        return Promise.reject({ status: 400, msg: "Invalid order" })
+    }
+    const queryString = `SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id ${filter} GROUP BY articles.article_id, comments.article_id ORDER BY articles.${sort} ${order};`;
     return db
-        .query('SELECT COUNT(comment_id), articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes FROM articles JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id, comments.article_id ORDER BY articles.created_at DESC;')
+        .query(queryString, array)
         .then(({ rows }) => {
+            if (!rows[0]) {
+                return Promise.reject({ status: 400, msg: "No articles on this topic" })
+            };
             return rows;
         })
 };
@@ -38,6 +59,18 @@ exports.selectCommentsByArticleId = (article_id) => {
             if (!rows[0]) {
                 return Promise.reject({ status: 404, msg: "Article does not exist" })
             };
+            return rows;
+        });
+};
+
+exports.insertComment = (newComment) => {
+    const { username, body, article_id } = newComment;
+    if(!username || !body){
+        return Promise.reject({ status: 400, msg: "Insufficient info" })
+        }
+    return db
+        .query('INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;', [username, body, article_id])
+        .then(({ rows }) => {
             return rows;
         });
 };
