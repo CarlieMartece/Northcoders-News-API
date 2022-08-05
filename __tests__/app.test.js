@@ -25,6 +25,31 @@ describe('handles all bad URLs', () => {
 });
 
 
+describe('/api', () => {
+    test('GET: 200 sends JSON describing all available endpoints', () => {
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({ body }) => {
+                const { apiEndpoints } = body;
+                expect(apiEndpoints).toEqual(
+                    expect.objectContaining({
+                        'GET /api': expect.any(Object),
+                        'GET /api/articles': expect.any(Object),
+                        'GET /api/articles/:article_id': expect.any(Object),
+                        'PATCH /api/articles/:article_id': expect.any(Object),
+                        'GET /api/articles/:article_id/comments': expect.any(Object),
+                        'POST /api/articles/:article_id/comments': expect.any(Object),
+                        'DELETE /api/comments/:comment_id': expect.any(Object),
+                        'GET /api/topics': expect.any(Object),
+                        'GET /api/users': expect.any(Object),
+                    })
+                );
+            });
+    });
+});
+
+
 describe('/api/articles', () => {
     test('GET:200 sends an array of article objects with required properties', () => {
         return request(app)
@@ -267,35 +292,6 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toBe('Article does not exist')
             });
     });
-});
-
-
-describe('/api/comments/:comment_id', () => {
-    test('DELETE:204 deletes comment and responds with no content', () => {
-        return request(app)
-            .delete('/api/comments/42')
-            .expect(204)
-            .then(({ body }) => {
-                const { content } = body;
-                expect(content).toBe(undefined)
-            });
-    });
-    test('DELETE:400 responds with error message for invalid comment id', () => {
-        return request(app)
-            .delete('/api/comments/banana')
-            .expect(400)
-            .then((response) => {
-                expect(response.body.msg).toBe("Invalid ID")
-            });
-    });
-    test('DELETE:404 responds with error message for valid but non-existent comment id', () => {
-        return request(app)
-            .delete('/api/comments/3141')
-            .expect(404)
-            .then((response) => {
-                expect(response.body.msg).toBe("Comment does not exist")
-            });
-    });
     test('POST:200 adds comment and responds with posted comment', () => {
         const newComment = {
             'username': 'jessjelly',
@@ -324,12 +320,12 @@ describe('/api/comments/:comment_id', () => {
             'body': 'It were reet'
         };
         return request(app)
-        .post('/api/articles/not-an-article/comments')
-        .send(newComment)
-            .expect(400)
-            .then((response) => {
-                expect(response.body.msg).toBe('Invalid ID');
-            });
+            .post('/api/articles/not-an-article/comments')
+            .send(newComment)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Invalid ID');
+                });
     });
     test('POST:400 sends error message when no comment provided', () => {
         const blankBody = {
@@ -380,6 +376,35 @@ describe('/api/comments/:comment_id', () => {
             .then((response) => {
                 expect(response.body.msg).toBe('ID does not exist')
             })
+    });
+});
+
+
+describe('/api/comments/:comment_id', () => {
+    test('DELETE:204 deletes comment and responds with no content', () => {
+        return request(app)
+            .delete('/api/comments/42')
+            .expect(204)
+            .then(({ body }) => {
+                const { content } = body;
+                expect(content).toBe(undefined)
+            });
+    });
+    test('DELETE:400 responds with error message for invalid comment id', () => {
+        return request(app)
+            .delete('/api/comments/banana')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid ID")
+            });
+    });
+    test('DELETE:404 responds with error message for valid but non-existent comment id', () => {
+        return request(app)
+            .delete('/api/comments/3141')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Comment does not exist")
+            });
     });
 });
 

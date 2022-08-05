@@ -1,3 +1,4 @@
+const apiEndpoints = require('../endpoints.json');
 const {
     selectArticles,
     selectArticleById,
@@ -8,6 +9,11 @@ const {
     selectTopics,
     selectUsers,
 } = require('../models/topics-models.js');
+
+
+exports.getApi = (req, res, next) => {
+    res.status(200).send({ apiEndpoints });
+}
 
 
 exports.getArticles = (req, res, next) => {
