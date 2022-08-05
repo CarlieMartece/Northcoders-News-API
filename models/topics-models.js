@@ -43,6 +43,11 @@ exports.selectCommentsByArticleId = (article_id) => {
 };
 
 
+exports.deleteCommentById = (comment_id) => {
+    console.log(comment_id)
+};
+
+
 exports.selectTopics = () => {
     return db.query('SELECT * FROM topics;').then((result) => {
         return result.rows;

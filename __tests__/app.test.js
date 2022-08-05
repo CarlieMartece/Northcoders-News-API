@@ -197,9 +197,21 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe('Article does not exist')
-            })
+            });
     });
 });
+
+
+// describe('/api/comments/:comment_id', () => {
+//     test('DELETE:204: deletes comment and responds with no content', () => {
+//         return request(app)
+//             .delete('/api/comments/42')
+//             .expect(204)
+//             // .then((response) => {
+//             //     expect(response.body.msg).toBe('Comment does not exist')
+//             // });
+//     });
+// });
 
 
 describe('/api/topics', () => {
