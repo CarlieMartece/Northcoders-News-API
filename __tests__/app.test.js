@@ -265,7 +265,36 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe('Article does not exist')
-            })
+            });
+    });
+});
+
+
+describe('/api/comments/:comment_id', () => {
+    test('DELETE:204 deletes comment and responds with no content', () => {
+        return request(app)
+            .delete('/api/comments/42')
+            .expect(204)
+            .then(({ body }) => {
+                const { content } = body;
+                expect(content).toBe(undefined)
+            });
+    });
+    test('DELETE:400 responds with error message for invalid comment id', () => {
+        return request(app)
+            .delete('/api/comments/banana')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid ID")
+            });
+    });
+    test('DELETE:404 responds with error message for valid but non-existent comment id', () => {
+        return request(app)
+            .delete('/api/comments/3141')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Comment does not exist")
+            });
     });
     test('POST:200 adds comment and responds with posted comment', () => {
         const newComment = {
