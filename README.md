@@ -1,26 +1,75 @@
-# Noooka's News API
+<a name="readme-top"></a>
 
-View At: https://nookas-news.herokuapp.com/api/
+<br />
+<div align="center">
+    <a href="https://github.com/CarlieMartece/Northcoders-News-API">
+    <img src="./logo.png" alt="Logo" width="80" height="80">
+  </a>
 
-Tired of the usual, boring news? Try Nooka's news, a brand new and totally orginal news app.
-Filled with:
-Articles! On the fascinating subjects of coding, cooking and (sorry) football.
-Comments! In latin in case you fancy accidentally summoning a demon in your office or living room.
-Users! Who are definitely real.
+<h3 align="center">Nooka's News</h3>
 
-## Set-Up: First steps
+  <p align="center">
+    Very Important Articles
+    <br />
+    <a href="https://github.com/CarlieMartece/Northcoders-News-API"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/CarlieMartece/Northcoders-News-API">View Demo</a>
+    ·
+    <a href="https://github.com/CarlieMartece/Northcoders-News-API/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/CarlieMartece/Northcoders-News-API/issues">Request Feature</a>
+  </p>
+</div>
 
-1. Fork repository, then clone by typing "git clone http-address" into terminal.
-2. Install dependencies:
-npm install jest
-npm install dotenv
-npm install express
-npm install pg
-npm install pg-format
-npm install supertest
-npm install husky
-3. Seed local database:
-npm run setup-dbs
+## About The Project
+
+[![Product Name Screen Shot][product-screenshot]](https://nookasnews.netlify.app/)
+
+This is the back-end repo for Nooka's News.<br />
+
+The front-end repo for this app can be found <a href="https://github.com/CarlieMartece/nc-news">here</a><br />
+
+This app lets you share articles about:<br />
+* Coding! Our favourite subject
+* Cooking! Because who doesn't love food?
+* Football (Sorry about this)
+
+All with bonus comments in latin in case you fancy accidentally summoning a demon in your office or living room.
+
+The main user features so far are:
+
+* Browse articles by topic
+* Sort articles by Date, Title, Topic, Author and Votes
+* UpVote or DownVote and article
+* View or hide and article's comments
+* Add comments to an article
+* Delete your comments from an article
+
+
+## Getting Started
+
+To get a local copy up and running follow these simple example steps.
+
+
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/CarlieMartece/Northcoders-News-API.git
+   ```
+2. cd into repo
+   ```sh
+   cd Northcoders-News-API
+   ```
+3. Install NPM packages
+   ```sh
+   npm install
+   ```
+4. Seed local database:
+    ```sh
+    npm run setup-dbs
+    ```
 
 ## Set-Up: Create Environment Variables
 
@@ -32,6 +81,43 @@ After cloning this repo, to run project locally:
 4. In .env.development add PGDATABASE=nc_news
 5. Make sure .env.* is added to .gitignore
 
+## Making Changes
+
+1. Create a new branch
+   ```sh
+   git checkout -b <new_branch_name>
+   ```
+2. Add new code. Suggested additions are:
+
+* Express routers
+* GET /api/users/:username
+* PATCH /api/comments/:comment_id
+* POST /api/articles
+* GET /api/articles (pagination)
+* GET /api/articles/:article_id/comments (pagination)
+* POST /api/topics
+* DELETE /api/articles/:article_id
+
+<br />
+
+3. Upload new branch
+   ```sh
+   git push origin <branch_name>
+   ```
+
+4. Create pull request and check for potential merge conflicts.
+<br />
+
 ## To Run Tests
 
 To run app tests, type "npm test __tests__/app.test.js" into terminal
+
+## Acknowledgments
+
+* This app was made possible by the awesome team at Northcoders!
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+[product-screenshot]: ./screenshot.png
