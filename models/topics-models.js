@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../db');
 
 
 exports.selectArticles = (queries) => {
